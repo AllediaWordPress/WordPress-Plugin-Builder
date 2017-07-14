@@ -10,20 +10,18 @@ use Robo\Exception\TaskExitException;
  */
 class Base extends \Robo\Tasks
 {
-    const SOURCE_PATH = 'src';
+    protected $source_path = 'src';
 
-    const VENDOR_PATH = 'vendor';
+    protected $packages_path = 'packages';
 
-    const PACKAGE_PATH = 'packages';
-
-    const PLUGIN_NAME = 'unnamed';
+    protected $plugin_name = 'unnamed';
 
     /**
      * Get the current version of the plugin
      */
     protected function getVersion()
     {
-        $file = file_get_contents(self::SOURCE_PATH . '/' .  self::PLUGIN_NAME . '.php');
+        $file = file_get_contents($this->source_path . '/' .  $this->plugin_name . '.php');
 
         preg_match('/Version:\s*([0-9\.a-z]*)/i', $file, $matches);
 
@@ -40,16 +38,16 @@ class Base extends \Robo\Tasks
         $this->say('Building the package');
 
         // Update composer dependencies
-        $this->_exec('composer update --no-dev -d ' . self::SOURCE_PATH );
+        $this->_exec('composer update --no-dev -d ' . $this->source_path );
 
         // Create packages folder if not exists
-        if (! file_exists(self::PACKAGE_PATH)) {
-            mkdir(self::PACKAGE_PATH);
+        if (! file_exists($this->packages_path)) {
+            mkdir($this->packages_path);
         }
 
         // Prepare the variables
-        $filename = self::PLUGIN_NAME . '.zip';
-        $packPath = self::PACKAGE_PATH . '/'. $filename;
+        $filename = $this->plugin_name . '.zip';
+        $packPath = $this->packages_path . '/'. $filename;
         $tmpPath  = tempnam(sys_get_temp_dir(), 'dir');
         $pack     = $this->taskPack($packPath);
 
@@ -69,7 +67,7 @@ class Base extends \Robo\Tasks
         mkdir($tmpPath);
 
         // Copy the src folder
-        $this->_copyDir(self::SOURCE_PATH, $tmpPath);
+        $this->_copyDir($this->source_path, $tmpPath);
 
         // Add to the package
         $srcContent = scandir($tmpPath);
@@ -115,7 +113,7 @@ class Base extends \Robo\Tasks
 
             $this->say('Moving the new package to ' . $destFile);
 
-            rename(self::PACKAGE_PATH . '/' . $filename, $destFile);
+            rename($this->packages_path . '/' . $filename, $destFile);
         }
 
         $this->say("Package built successfully");
@@ -155,8 +153,8 @@ class Base extends \Robo\Tasks
      */
     public function buildS3() {
         $s3Bucket = getenv('PS_S3_BUCKET');
-        $filename = self::PLUGIN_NAME . '.zip';
-        $packPath = self::PACKAGE_PATH . '/'. $filename;
+        $filename = $this->plugin_name . '.zip';
+        $packPath = $this->packages_path . '/'. $filename;
 
         $this->build();
 
@@ -252,7 +250,7 @@ class Base extends \Robo\Tasks
     public function install()
     {
         $wpPath      = getenv('PS_WP_PATH');
-        $stagingPath = $wpPath  . '/wp-content/plugins/' . self::PLUGIN_NAME;
+        $stagingPath = $wpPath  . '/wp-content/plugins/' . $this->plugin_name;
 
         if (empty($wpPath)) {
             throw new RuntimeException('Invalid WordPress path. Please, set the environment variable: PS_WP_PATH');
@@ -269,13 +267,13 @@ class Base extends \Robo\Tasks
         }
 
         // Copy the src folder
-        $this->_copyDir(self::SOURCE_PATH, $stagingPath);
+        $this->_copyDir($this->source_path, $stagingPath);
 
         return true;
     }
 
     public function gitCleanup()
     {
-        shell_exec('git clean -xdf ' . self::SOURCE_PATH);
+        shell_exec('git clean -xdf ' . $this->source_path);
     }
 }
