@@ -247,7 +247,7 @@ class Base extends \Robo\Tasks
     /**
      * Sync staging files with src files
      */
-    public function install()
+    public function syncWp()
     {
         $wpPath      = getenv('PS_WP_PATH');
         $stagingPath = $wpPath  . '/wp-content/plugins/' . $this->plugin_name;
@@ -268,6 +268,31 @@ class Base extends \Robo\Tasks
 
         // Copy the src folder
         $this->_copyDir($this->source_path, $stagingPath);
+
+        return true;
+    }
+
+    /**
+     * Sync src files with staging files
+     */
+    public function syncSrc()
+    {
+        $wpPath      = getenv('PS_WP_PATH');
+        $stagingPath = $wpPath  . '/wp-content/plugins/' . $this->plugin_name;
+
+        if (empty($wpPath)) {
+            throw new RuntimeException('Invalid WordPress path. Please, set the environment variable: PS_WP_PATH');
+        }
+
+        if (!file_exists($wpPath . '/wp-config.php')) {
+            throw new RuntimeException('WordPress not found on: ' . $wpPath . '. Check the PS_WP_PATH environment variable');
+        }
+
+        // Cleanup the src folder
+        $this->_cleanDir($this->source_path);
+
+        // Copy to the src folder
+        $this->_copyDir($stagingPath, $this->source_path);
 
         return true;
     }
