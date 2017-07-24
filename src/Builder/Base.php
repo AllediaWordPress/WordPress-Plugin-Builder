@@ -176,7 +176,7 @@ class Base extends \Robo\Tasks
         $this->_exec($cmd);
 
         // Copy the public link to the clipboard
-        $this->_exec('s3cmd info ' . $s3Path . ' | grep "URL:" | awk \'{ print $2 }\' | xclip');
+        $this->_exec('s3cmd info ' . $s3Path . ' | grep "URL:" | awk \'{ print $2 }\' | xclip -selection "clipboard"');
     }
 
     /**
