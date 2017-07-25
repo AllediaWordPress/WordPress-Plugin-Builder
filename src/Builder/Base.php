@@ -301,4 +301,89 @@ class Base extends \Robo\Tasks
     {
         shell_exec('git clean -xdf ' . $this->source_path);
     }
+
+    /**
+     * Display the current version of the plugin
+     */
+    public function version() {
+        $this->say( 'Current Version: ' . $this->getVersion() );
+    }
+
+    /**
+     * Set a new version to the plugin
+     */
+    public function versionSet( $newVersion = null ) {
+        // Make sure we don't have an empty version
+        if ( empty( $newVersion ) ) {
+            $newVersion = $this->getVersion();
+        }
+
+        $this->say( 'Original version: ' . $this->getVersion() );
+
+        $this->updateVersionMainPluginFile( $newVersion );
+        $this->udpateVersionTxtFile( $newVersion );
+        $this->udpateIncludeFile( $newVersion );
+
+        $this->say( 'Current version: ' . $this->getVersion() );
+    }
+
+    /**
+     * Updates the version in the main plugin file
+     */
+    protected function updateVersionMainPluginFile( $newVersion ) {
+        $file = $this->source_path . '/' .  $this->plugin_name . '.php';
+        $content = file_get_contents( $file );
+
+        $content = preg_replace('/( *)\*( *)Version:( *)([0-9\-a-z\.]+)/', '$1*$2Version:$3____NEW_VERSION____' , $content);
+        $content = str_replace( '____NEW_VERSION____', $newVersion, $content);
+
+        if ( file_put_contents( $file, $content ) ) {
+            $this->say( 'Updated file: ' . $this->plugin_name . '.php' );
+        }
+    }
+
+    /**
+     * Returns true if the given version is a stable release.
+     *
+     * @return bool
+     */
+    protected function is_stable_version( $version ) {
+        return ! preg_match( '/[a-z]/', $version );
+    }
+
+    /**
+     * Updates the version in the plugin's txt file, if it is a
+     * stable version.
+     */
+    protected function udpateVersionTxtFile( $newVersion ) {
+        if ( ! $this->is_stable_version( $newVersion ) ) {
+            return;
+        }
+
+        $file = $this->source_path . '/readme.txt';
+        $content = file_get_contents( $file );
+
+        $content = preg_replace('/Stable tag:( *)([0-9\-a-z\.]+)/', 'Stable tag:$1____NEW_VERSION____' , $content);
+        $content = str_replace( '____NEW_VERSION____', $newVersion, $content);
+
+        if ( file_put_contents( $file, $content ) ) {
+            $this->say( 'Updated file: readme.txt' );
+        }
+    }
+
+    /**
+     * Updates the version in the plugin's txt file, if it is a
+     * stable version.
+     */
+    protected function udpateIncludeFile( $newVersion ) {
+        $file = $this->source_path . '/includes.php';
+        $content = file_get_contents( $file );
+
+        $content = preg_replace('/(\s*define\(\ *[\'"][A-Z\_]+_VERSION[\'"],\ [\'"])[0-9\-\.a-z]+([\'"])/', '$1____NEW_VERSION____$2' , $content);
+        $content = str_replace( '____NEW_VERSION____', $newVersion, $content);
+
+        if ( file_put_contents( $file, $content ) ) {
+            $this->say( 'Updated file: includes.php' );
+        }
+    }
 }
