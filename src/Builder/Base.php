@@ -16,6 +16,8 @@ class Base extends \Robo\Tasks
 
     protected $plugin_name = 'unnamed';
 
+    protected $version_constant = 'VERSION';
+
     /**
      * Get the current version of the plugin
      */
@@ -379,7 +381,11 @@ class Base extends \Robo\Tasks
         $file = $this->source_path . '/includes.php';
         $content = file_get_contents( $file );
 
-        $content = preg_replace('/(\s*define\(\ *[\'"][A-Z\_]+_VERSION[\'"],\ [\'"])[0-9\-\.a-z]+([\'"])/', '$1____NEW_VERSION____$2' , $content);
+        $content = preg_replace(
+            '/(\s*define\(\ *[\'"]' . $this->version_constant . '[\'"],\ [\'"])[0-9\-\.a-z]+([\'"])/',
+            '$1____NEW_VERSION____$2',
+            $content
+        );
         $content = str_replace( '____NEW_VERSION____', $newVersion, $content);
 
         if ( file_put_contents( $file, $content ) ) {
