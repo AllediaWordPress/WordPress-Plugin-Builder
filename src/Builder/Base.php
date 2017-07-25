@@ -23,7 +23,7 @@ class Base extends \Robo\Tasks
     {
         $file = file_get_contents($this->source_path . '/' .  $this->plugin_name . '.php');
 
-        preg_match('/Version:\s*([0-9\.a-z]*)/i', $file, $matches);
+        preg_match('/Version:\s*([0-9\.a-z\-]*)/i', $file, $matches);
 
         return $matches[1];
     }
