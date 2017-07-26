@@ -46,7 +46,7 @@ class Robo_Task extends \Robo\Tasks
 
         // Prepare the variables
         $version        = $this->getVersion();
-        $filename       = $this->plugin_name . '.zip';
+        $filename       = $this->plugin_name . '-' . $version . '.zip';
         $filePath       = $this->packages_path . '/'. $filename;
         $tmpPath        = tempnam(sys_get_temp_dir(), 'dir');
         $pack           = $this->taskPack($filePath);
