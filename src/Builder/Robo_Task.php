@@ -8,7 +8,7 @@ use Robo\Exception\TaskExitException;
  *
  * @see http://robo.li/
  */
-class Base extends \Robo\Tasks
+class Robo_Task extends \Robo\Tasks
 {
     protected $source_path = 'src';
 
