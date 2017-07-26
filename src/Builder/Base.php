@@ -37,21 +37,19 @@ class Base extends \Robo\Tasks
      */
     public function build($destination = null)
     {
-        $this->say('Building the package');
-
-        // Update composer dependencies
-        $this->_exec('composer update --no-dev -d ' . $this->source_path );
-
         // Create packages folder if not exists
         if (! file_exists($this->packages_path)) {
             mkdir($this->packages_path);
         }
 
         // Prepare the variables
+        $version  = $this->getVersion();
         $filename = $this->plugin_name . '.zip';
         $packPath = $this->packages_path . '/'. $filename;
         $tmpPath  = tempnam(sys_get_temp_dir(), 'dir');
         $pack     = $this->taskPack($packPath);
+
+        $this->say('Building package for version ' . $version);
 
         // Remove existent package
         if (file_exists($packPath)) {
@@ -66,6 +64,10 @@ class Base extends \Robo\Tasks
                 $this->_deleteDir($tmpPath);
             }
         }
+        mkdir($tmpPath);
+
+        // Create the main folder inside the tmp folder
+        $tmpPath .= '/' . $this->plugin_name;
         mkdir($tmpPath);
 
         // Copy the src folder
