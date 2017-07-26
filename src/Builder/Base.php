@@ -37,6 +37,8 @@ class Base extends \Robo\Tasks
      */
     public function build($destination = null)
     {
+        $destination = getenv('PS_GLOBAL_PACKAGES_PATH');
+
         // Create packages folder if not exists
         if (! file_exists($this->packages_path)) {
             mkdir($this->packages_path);
@@ -108,7 +110,7 @@ class Base extends \Robo\Tasks
         $this->_deleteDir($tmpPath);
 
         // Should we move to any specific destination?
-        if (!is_null($destination)) {
+        if (!empty($destination)) {
             if (!realpath($destination)) {
                 throw new RuntimeException('Invalid destination path');
             }
@@ -123,18 +125,6 @@ class Base extends \Robo\Tasks
         $this->say("Package built successfully");
 
         return $return;
-    }
-
-    /**
-     * Build and move the package to a global path, set by
-     * PS_GLOBAL_PACKAGES_PATH
-     */
-    public function buildMove() {
-        $new_path = getenv('PS_GLOBAL_PACKAGES_PATH');
-
-        if (! empty($new_path)) {
-            $this->build($new_path);
-        }
     }
 
     /**
