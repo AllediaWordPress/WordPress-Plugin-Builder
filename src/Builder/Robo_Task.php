@@ -45,17 +45,18 @@ class Robo_Task extends \Robo\Tasks
         }
 
         // Prepare the variables
-        $version  = $this->getVersion();
-        $filename = $this->plugin_name . '.zip';
-        $packPath = $this->packages_path . '/'. $filename;
-        $tmpPath  = tempnam(sys_get_temp_dir(), 'dir');
-        $pack     = $this->taskPack($packPath);
+        $version        = $this->getVersion();
+        $filename       = $this->plugin_name . '.zip';
+        $filePath       = $this->packages_path . '/'. $filename;
+        $tmpPath        = tempnam(sys_get_temp_dir(), 'dir');
+        $pack           = $this->taskPack($filePath);
+        $folderPath     = $tmpPath .'/' . $this->plugin_name;
 
         $this->say('Building package for version ' . $version);
 
         // Remove existent package
-        if (file_exists($packPath)) {
-            unlink($packPath);
+        if (file_exists($filePath)) {
+            unlink($filePath);
         }
 
         // Cleanup on the tmp folder
@@ -69,16 +70,11 @@ class Robo_Task extends \Robo\Tasks
         mkdir($tmpPath);
 
         // Create the main folder inside the tmp folder
-        $tmpPath .= '/' . $this->plugin_name;
-        mkdir($tmpPath);
+        mkdir($folderPath);
 
-        // Copy the src folder
-        $this->_copyDir($this->source_path, $tmpPath);
-
-        // Add to the package
-        $srcContent = scandir($tmpPath);
-        foreach ($srcContent as $content) {
-            $ignore = array(
+        // Copy the src folder to the folder inside the tmp folder
+        $this->taskCopyDir([$this->source_path => $folderPath])
+            ->exclude([
                 '.',
                 '..',
                 'build',
@@ -86,12 +82,22 @@ class Robo_Task extends \Robo\Tasks
                 '.git',
                 '.gitignore',
                 'README',
+                'README.md',
                 '.DS_Store',
                 '.babelrc',
                 'package.json',
                 'composer.json',
                 'composer.lock',
-            );
+            ])
+            ->run();
+
+        // Add to the package
+        $srcContent = scandir($tmpPath);
+        foreach ($srcContent as $content) {
+            $ignore = [
+                '.',
+                '..',
+            ];
 
             if (! in_array($content, $ignore)) {
                 $path = $tmpPath . '/' . $content;
@@ -107,7 +113,7 @@ class Robo_Task extends \Robo\Tasks
         $return = $pack->run();
 
         // Removes tmp dir
-        $this->_deleteDir($tmpPath);
+        // $this->_deleteDir($tmpPath);
 
         // Should we move to any specific destination?
         if (!empty($destination)) {
@@ -148,7 +154,7 @@ class Robo_Task extends \Robo\Tasks
     public function buildS3() {
         $s3Bucket = getenv('PS_S3_BUCKET');
         $filename = $this->plugin_name . '.zip';
-        $packPath = $this->packages_path . '/'. $filename;
+        $filePath = $this->packages_path . '/'. $filename;
 
         $this->build();
 
@@ -164,7 +170,7 @@ class Robo_Task extends \Robo\Tasks
         );
         $cmd    = sprintf(
             's3cmd put --acl-public --reduced-redundancy %s %s',
-            $packPath,
+            $filePath,
             $s3Path
         );
         $this->_exec($cmd);
