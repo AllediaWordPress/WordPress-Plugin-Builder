@@ -31,6 +31,16 @@ class Robo_Task extends \Robo\Tasks
     }
 
     /**
+     * Returns the package name
+     *
+     * @return string
+     */
+    protected function getPackageName()
+    {
+        return $this->plugin_name . '-' . $this->getVersion() . '.zip';
+    }
+
+    /**
      * Build the ZIP package
      *
      * @param string $destination Destination for the package. The ZIP file will be moved to that path.
@@ -46,7 +56,7 @@ class Robo_Task extends \Robo\Tasks
 
         // Prepare the variables
         $version        = $this->getVersion();
-        $filename       = $this->plugin_name . '-' . $version . '.zip';
+        $filename       = $this->getPackageName();
         $filePath       = $this->packages_path . '/'. $filename;
         $tmpPath        = tempnam(sys_get_temp_dir(), 'dir');
         $pack           = $this->taskPack($filePath);
@@ -153,10 +163,20 @@ class Robo_Task extends \Robo\Tasks
      */
     public function buildS3() {
         $s3Bucket = getenv('PS_S3_BUCKET');
-        $filename = $this->plugin_name . '.zip';
+        $filename = $this->getPackageName();
         $filePath = $this->packages_path . '/'. $filename;
 
         $this->build();
+
+        // Should we move to any specific destination?
+        $destination = getenv('PS_GLOBAL_PACKAGES_PATH');
+        if (!empty($destination)) {
+            if (!realpath($destination)) {
+                throw new RuntimeException('Invalid destination path');
+            }
+
+            $filePath = realpath($destination) . '/' . $filename;
+        }
 
         // Create new prefix
         $prefix = md5(microtime());
