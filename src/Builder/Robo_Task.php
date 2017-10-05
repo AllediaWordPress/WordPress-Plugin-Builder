@@ -196,7 +196,13 @@ class Robo_Task extends \Robo\Tasks
         $this->_exec($cmd);
 
         // Copy the public link to the clipboard
-        $this->_exec('s3cmd info ' . $s3Path . ' | grep "URL:" | awk \'{ print $2 }\' | xclip -selection "clipboard"');
+        if (stripos(PHP_OS, 'darwin') === 0) {
+            $pbcode = 'pbcopy';
+        } elseif (stripos(PHP_OS, 'linux') === 0) {
+            $pbcode = 'xclip -selection "clipboard"';
+        }
+
+        $this->_exec('s3cmd info ' . $s3Path . ' | grep "URL:" | awk \'{ print $2 }\' | ' . $pbcode);
     }
 
     /**
