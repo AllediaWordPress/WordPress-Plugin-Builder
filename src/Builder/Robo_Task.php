@@ -1,7 +1,8 @@
 <?php
 namespace PressShack\Builder;
 
-use Robo\Exception\TaskExitException;
+use DirectoryIterator;
+use \Robo\Common\ExecOneCommand;
 
 /**
  * This is project's console commands configuration for Robo task runner.
@@ -47,6 +48,8 @@ class Robo_Task extends \Robo\Tasks
      */
     public function build($destination = null)
     {
+        $this->print_header();
+
         $destination = getenv('PS_GLOBAL_PACKAGES_PATH');
 
         // Create packages folder if not exists
@@ -162,6 +165,8 @@ class Robo_Task extends \Robo\Tasks
      *
      */
     public function buildS3() {
+        $this->print_header();
+
         $s3Bucket = getenv('PS_S3_BUCKET');
         $filename = $this->getPackageName();
         $filePath = $this->packages_path . '/'. $filename;
@@ -236,6 +241,8 @@ class Robo_Task extends \Robo\Tasks
      */
     public function langCompile()
     {
+        $this->print_header();
+
         $return = null;
         $files  = $this->getPoFiles();
 
@@ -253,6 +260,8 @@ class Robo_Task extends \Robo\Tasks
      */
     public function langWatch()
     {
+        $this->print_header();
+
         $return = null;
         $task   = $this->taskWatch();
         $files  = $this->getPoFiles();
@@ -275,6 +284,8 @@ class Robo_Task extends \Robo\Tasks
      */
     public function syncWp()
     {
+        $this->print_header();
+
         $wpPath      = getenv('PS_WP_PATH');
         $stagingPath = $wpPath  . '/wp-content/plugins/' . $this->plugin_name;
 
@@ -303,6 +314,8 @@ class Robo_Task extends \Robo\Tasks
      */
     public function syncSrc()
     {
+        $this->print_header();
+
         $wpPath      = getenv('PS_WP_PATH');
         $stagingPath = $wpPath  . '/wp-content/plugins/' . $this->plugin_name;
 
@@ -325,6 +338,8 @@ class Robo_Task extends \Robo\Tasks
 
     public function gitCleanup()
     {
+        $this->print_header();
+
         shell_exec('git clean -xdf ' . $this->source_path);
     }
 
@@ -332,13 +347,20 @@ class Robo_Task extends \Robo\Tasks
      * Display the current version of the plugin
      */
     public function version() {
-        $this->say( 'Current Version: ' . $this->getVersion() );
+        $this->print_header();
     }
 
     /**
      * Set a new version to the plugin
      */
     public function versionSet( $newVersion = null ) {
+        $this->print_header();
+
+        // If empty, ask for a new version
+        if ( empty( $newVersion ) ) {
+            $newVersion = $this->io()->ask('New version: ');
+        }
+
         // Make sure we don't have an empty version
         if ( empty( $newVersion ) ) {
             $newVersion = $this->getVersion();
@@ -414,6 +436,195 @@ class Robo_Task extends \Robo\Tasks
 
         if ( file_put_contents( $file, $content ) ) {
             $this->say( 'Updated file: includes.php' );
+        }
+    }
+
+    /**
+     * Print the header.
+     */
+    protected function print_header() {
+
+        $title = "PressShack Builder Script: " . $this->plugin_name . "\n";
+        $title .= str_repeat( '-', strlen( $title ) ) . "\n";
+        $title .= "Plugin version: {$this->getVersion()}\n";
+
+        $this->io()->title($title);
+    }
+
+    /**
+     * Deploy to Git and SVN
+     */
+    public function release( $new_version = null ) {
+        $this->print_header();
+
+        /**
+
+            TODO:
+            - Check current git branch. Should be master. Ask for confirmation if not.
+            - Check if we have a clean working copy. Abort if not.
+            - Do we have a github tag for the new version?
+            - Automatically release to Github, sending the package.
+
+         */
+
+
+        $new_version = $this->askDefault('Version to release: ', $this->getVersion());
+
+        if ( ! $this->confirm('Do you really want to release the version ' . $new_version) ) {
+            $this->say('Aborting! Thanks');
+            return;
+        }
+
+        // Set the new version
+        $this->versionSet( $new_version );
+
+        $svn_path = getenv('PS_WP_SVN_PATH') . '/' . $this->plugin_name;
+
+        if ( ! realpath( $svn_path ) ) {
+            $this->say('SVN repo Path invalid: ' . $svn_path);
+
+            return ;
+        }
+
+        $svn_trunk = $svn_path . '/trunk';
+
+        $this->say('SVN repo: ' . $svn_path);
+        $this->io->writeln('');
+
+        $this->yell('Preparing to release...', 40, 'blue');
+
+        $this->io->writeln('');
+
+        // Resetting the SVN repo
+        $this->say('Reseting SVN repository to the lastest version...');
+        $this->_exec("svn status {$svn_path} --no-ignore");
+
+        // Remove added files before update
+        $result = $this->taskExec('svn st ' . $svn_path)
+            ->printOutput(false)
+            ->run();
+
+        $result = $result->getMessage();
+        preg_match_all('/^\?\s*([a-z0-9\-_\.\/]*)/im', $result, $matches);
+
+        if (isset($matches[1]) && !empty($matches[1])) {
+            foreach ($matches[1] as $file) {
+                $file = trim($file);
+
+                $this->_exec('rm ' . $file);
+            }
+        }
+
+        $this->_exec("svn update {$svn_path} --force");
+
+
+        // Cleanup the public folder in the SVN repo
+        $this->say('Cleaning up the svn/trunk directory...');
+
+        if ( is_dir( $svn_trunk ) ) {
+            $this->rrmdir( $svn_trunk );
+        }
+
+        mkdir( $svn_trunk );
+
+        // Copy the new code to the trunk folder
+        $this->say('Copying new code to trunk...');
+        $this->copy_dir_content( $this->source_path, $svn_trunk);
+
+        // Check if we have new files
+        $result = $this->taskExec('svn st ' . $svn_path)
+            ->printOutput(false)
+            ->run();
+
+        $result = $result->getMessage();
+
+        preg_match_all('/^\?\s*([a-z0-9\-_\.\/]*)/im', $result, $matches);
+
+        if (isset($matches[1]) && !empty($matches[1])) {
+            foreach ($matches[1] as $file) {
+                $file = trim($file);
+
+                $this->_exec('svn add ' . $file);
+            }
+        }
+
+        // Check if we have deleted files
+        preg_match_all('/^\!\s*([a-z0-9\-_\.\/]*)/im', $result, $matches);
+
+        if (isset($matches[1]) && !empty($matches[1])) {
+            foreach ($matches[1] as $file) {
+                $file = trim($file);
+
+                $this->_exec('svn rm ' . $file);
+            }
+        }
+
+        // Check if we have changes to commit
+
+        // Remove added files before update
+        $result = $this->taskExec('svn st ' . $svn_path)
+            ->printOutput(false)
+            ->run();
+
+        $result = trim($result->getMessage());
+
+        if (empty($result)) {
+            $this->yell('Nothing to commit. Aborting release...', 40, 'red');
+
+            return ;
+        }
+
+        $commit_message = 'Releasing ' . $new_version;
+        $commit_message = $this->askDefault( 'Commit message: ', $commit_message );
+
+        // Commit
+        $this->_exec("svn ci {$svn_path} -m \"{$commit_message}\"");
+
+        // Tagging the new version
+        $this->_exec("svn cp {$svn_path}/trunk {$svn_path}/tags/{$new_version}");
+        $this->_exec("svn ci {$svn_path} -m \"Tagging {$new_version}\"");
+
+        $this->writeln('');
+        $this->say("Version {$new_version} released successfully");
+    }
+
+    /**
+     * Recursively removes a folder along with all its files and directories
+     *
+     * @param String $path
+     */
+    protected function rrmdir($path) {
+        // Open the source directory to read in files
+        $i = new DirectoryIterator($path);
+        foreach($i as $f) {
+            if($f->isFile()) {
+                unlink($f->getRealPath());
+            } else if(!$f->isDot() && $f->isDir()) {
+                $this->rrmdir($f->getRealPath());
+            }
+        }
+
+        rmdir($path);
+    }
+
+    /**
+     * Copy content of directory to another.
+     *
+     * @param  [type] $source [description]
+     * @param  [type] $dest   [description]
+     * @return [type]         [description]
+     */
+    protected function copy_dir_content($source, $dest) {
+        foreach (
+            $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST) as $item
+        ) {
+            if ($item->isDir()) {
+                mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            } else {
+                copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            }
         }
     }
 }
