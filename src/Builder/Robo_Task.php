@@ -454,7 +454,7 @@ class Robo_Task extends \Robo\Tasks
     /**
      * Deploy to Git and SVN
      */
-    public function release( $new_version = null ) {
+    public function releaseSvn( $new_version = null ) {
         $this->print_header();
 
         /**
