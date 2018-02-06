@@ -1,5 +1,5 @@
 <?php
-namespace PressShack\Builder;
+namespace PublishPress\Builder;
 
 use DirectoryIterator;
 use \Robo\Common\ExecOneCommand;
@@ -9,15 +9,36 @@ use \Robo\Common\ExecOneCommand;
  *
  * @see http://robo.li/
  */
-class Robo_Task extends \Robo\Tasks
+abstract class AbstractTask extends \Robo\Tasks
 {
-    protected $source_path = 'src';
+    protected $source_path = './';
 
     protected $packages_path = 'packages';
 
     protected $plugin_name = 'unnamed';
 
     protected $version_constant = 'VERSION';
+
+
+    protected  function getExcludes()
+    {
+        return [
+            '.',
+            '..',
+            'build',
+            'packages',
+            'tests',
+            '.git',
+            '.gitignore',
+            'README',
+            'README.md',
+            '.DS_Store',
+            '.babelrc',
+            'package.json',
+            '.idea',
+            'vendor/bin',
+        ];
+    }
 
     /**
      * Get the current version of the plugin
@@ -87,21 +108,7 @@ class Robo_Task extends \Robo\Tasks
 
         // Copy the src folder to the folder inside the tmp folder
         $this->taskCopyDir([$this->source_path => $folderPath])
-            ->exclude([
-                '.',
-                '..',
-                'build',
-                'tests',
-                '.git',
-                '.gitignore',
-                'README',
-                'README.md',
-                '.DS_Store',
-                '.babelrc',
-                'package.json',
-                'composer.json',
-                'composer.lock',
-            ])
+            ->exclude($this->getExcludes())
             ->run();
 
         // Add to the package

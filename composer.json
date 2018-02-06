@@ -1,18 +1,18 @@
 {
-	"name"       : "pressshack/wordpress-plugin-builder",
+	"name"       : "publishpress/wordpress-plugin-builder",
 	"description": "Base class for WordPress plugin builder",
 	"type"       : "script",
 	"license"    : "GPL-2.0+",
 	"authors"    : [
 		{
-			"name": "PressShack",
-			"email": "help@presshack.com",
-			"homepage": "https://pressshack.com"
+			"name": "PublishPress",
+			"email": "help@publishpress.com",
+			"homepage": "https://publishpress.com"
 		}
 	],
 	"autoload": {
         "psr-4": {
-            "PressShack\\": "src/"
+            "PublishPress\\Builder": "src/"
         }
     }
 }
