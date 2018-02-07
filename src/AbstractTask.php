@@ -25,12 +25,12 @@ abstract class AbstractTask extends \Robo\Tasks
     public function __construct()
     {
         if (!isset($this->base_path)) {
-            $this->say('Please, define the attribute $this->base_path in the constructor.');
+            echo 'Please, define the attribute $this->base_path in the constructor.';
             exit;
         }
 
         if (!file_exists(realpath($this->base_path))) {
-            $this->say('Sorry, base_path is not a valid path.');
+            echo 'Sorry, base_path is not a valid path.';
             exit;
         }
 
