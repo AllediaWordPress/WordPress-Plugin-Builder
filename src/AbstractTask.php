@@ -79,6 +79,18 @@ abstract class AbstractTask extends \Robo\Tasks
         return $this->plugin_name . '-' . $this->getVersion() . '.zip';
     }
 
+    protected function say($string)
+    {
+        echo '➜ ' . $string . "\n";
+    }
+
+    protected function yell($text, $length = 40, $color = 'green')
+    {
+        $char = '➜';
+        $format = "$char  <fg=white;bg=$color;options=bold>%s</fg=white;bg=$color;options=bold>";
+        $this->say($format . $text);
+    }
+
     /**
      * Build the ZIP package
      *
