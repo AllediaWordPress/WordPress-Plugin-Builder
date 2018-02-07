@@ -11,14 +11,32 @@ use \Robo\Common\ExecOneCommand;
  */
 abstract class AbstractTask extends \Robo\Tasks
 {
-    protected $source_path = './';
+    protected $base_path;
 
-    protected $packages_path = 'packages';
+    protected $source_path = '/src';
+
+    protected $packages_path = '/packages';
 
     protected $plugin_name = 'unnamed';
 
     protected $version_constant = 'VERSION';
 
+
+    public function __construct()
+    {
+        if (!isset($this->base_path)) {
+            $this->yell('Please, define the attribute $this->base_path in the constructor.', 40, 'red');
+            exit;
+        }
+
+        if (!file_exists(realpath($this->base_path))) {
+            $this->yell('Sorry, base_path is not a valid path.', 40, 'red');
+            exit;
+        }
+
+        $this->source_path   = $this->base_path . $this->source_path;
+        $this->packages_path = $this->base_path . $this->packages_path;
+    }
 
     protected  function getExcludes()
     {
@@ -36,7 +54,6 @@ abstract class AbstractTask extends \Robo\Tasks
             '.babelrc',
             'package.json',
             '.idea',
-            'vendor/bin',
         ];
     }
 
@@ -238,9 +255,9 @@ abstract class AbstractTask extends \Robo\Tasks
         $moFile = str_replace('.po', '.mo', $poFile);
 
         return $this->taskExec('msgfmt')
-                ->arg('-o' . $moFile)
-                ->arg($poFile)
-                ->run();
+            ->arg('-o' . $moFile)
+            ->arg($poFile)
+            ->run();
     }
 
     /**
@@ -466,11 +483,11 @@ abstract class AbstractTask extends \Robo\Tasks
 
         /**
 
-            TODO:
-            - Check current git branch. Should be master. Ask for confirmation if not.
-            - Check if we have a clean working copy. Abort if not.
-            - Do we have a github tag for the new version?
-            - Automatically release to Github, sending the package.
+        TODO:
+        - Check current git branch. Should be master. Ask for confirmation if not.
+        - Check if we have a clean working copy. Abort if not.
+        - Do we have a github tag for the new version?
+        - Automatically release to Github, sending the package.
 
          */
 
@@ -624,8 +641,8 @@ abstract class AbstractTask extends \Robo\Tasks
     protected function copy_dir_content($source, $dest) {
         foreach (
             $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST) as $item
+                new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST) as $item
         ) {
             if ($item->isDir()) {
                 mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
