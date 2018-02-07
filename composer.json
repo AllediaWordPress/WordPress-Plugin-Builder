@@ -1,7 +1,7 @@
 {
 	"name"       : "publishpress/wordpress-plugin-builder",
 	"description": "Base class for WordPress plugin builder",
-	"type"       : "script",
+	"type"       : "library",
 	"license"    : "GPL-2.0+",
 	"authors"    : [
 		{
