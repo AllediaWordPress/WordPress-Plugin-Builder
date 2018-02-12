@@ -74,6 +74,7 @@
                 <exclude name=".travis.yml"/>
                 <exclude name="build.xml"/>
                 <exclude name="codeception.yml"/>
+                <exclude name="dist.codeception.yml"/>
                 <exclude name="composer.json"/>
                 <exclude name="composer.lock"/>
                 <exclude name="composer.lock"/>
