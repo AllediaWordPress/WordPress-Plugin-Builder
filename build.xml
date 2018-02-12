@@ -52,7 +52,7 @@
 
 
     <!-- Create the temporary dir -->
-    <target name="build-create-dist-dir">
+    <target name="build-create-dist-dir" hidden="true">
         <mkdir dir="${dist.dir.path}"/>
     </target>
 
