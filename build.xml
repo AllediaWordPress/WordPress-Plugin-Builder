@@ -19,6 +19,9 @@
 
         <!-- Compact the tmp dir -->
         <phingcall target="build-compact-tmp-dir"/>
+
+        <!-- Remove the tmp dir -->
+        <phingcall target="build-remove-dist-dir"/>
     </target>
 
 
@@ -50,6 +53,7 @@
                 <exclude name="tools/"/>
                 <exclude name="assets/"/>
                 <exclude name=".idea/"/>
+                <exclude name="vendor/publishpress/wordpress-plugin-builder/"/>
                 <exclude name=".DS_Store"/>
                 <exclude name=".babelrc"/>
                 <exclude name=".gitignore"/>
