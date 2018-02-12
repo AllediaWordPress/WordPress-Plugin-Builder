@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="PublishPress" default="">
+    <!-- Build a dist file -->
+    <target name="build">
+        <!-- Parameters -->
+        <property name="src.dir.path" value="./"/>
+        <property name="dist.dir.path" value="dist"/>
+        <property name="dist.file.name" value="${plugin.name}-${plugin.version}.zip"/>
+        <property name="dist.file.path" value="${dist.dir.path}/${dist.file.name}"/>
+        <property name="tmp.dir.path" value="${dist.dir.path}/${plugin.name}"/>
+
+        <!-- Create the dist folder -->
+        <phingcall target="build-remove-dist-dir"/>
+        <phingcall target="build-create-dist-dir"/>
+
+        <!-- Copy files to the dist dir -->
+        <phingcall target="build-copy-files-to-tmp-dir"/>
+
+        <!-- Compact the tmp dir -->
+        <phingcall target="build-compact-tmp-dir"/>
+    </target>
+
+
+    <!-- Remove tmp dir if exists and create an empty dir -->
+    <target name="build-remove-dist-dir" hidden="true">
+        <echo msg="Checking if the dist dir exists to remove it: ${dist.dir.path}"/>
+
+        <if>
+            <available file="${dist.dir.path}"/>
+            <then>
+                <delete dir="${dist.dir.path}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Create the temporary dir -->
+    <target name="build-create-dist-dir">
+        <mkdir dir="${dist.dir.path}"/>
+    </target>
+
+
+    <!-- Copy files to the tmp dir -->
+    <target name="build-copy-files-to-tmp-dir" hidden="true">
+        <copy todir="${tmp.dir.path}">
+            <fileset dir="${src.dir.path}">
+                <exclude name="dist/"/>
+                <exclude name="tests/"/>
+                <exclude name="tools/"/>
+                <exclude name="assets/"/>
+                <exclude name=".idea/"/>
+                <exclude name=".DS_Store"/>
+                <exclude name=".babelrc"/>
+                <exclude name=".gitignore"/>
+                <exclude name=".git"/>
+                <exclude name=".travis.yml"/>
+                <exclude name="build.xml"/>
+                <exclude name="codeception.yml"/>
+                <exclude name="composer.json"/>
+                <exclude name="composer.lock"/>
+                <exclude name="composer.lock"/>
+                <exclude name="package.json"/>
+                <exclude name="phpunit.xml"/>
+                <exclude name="README.md"/>
+                <exclude name="RoboFile.php"/>
+            </fileset>
+        </copy>
+    </target>
+
+
+    <target name="build-compact-tmp-dir" hidden="true">
+        <zip destfile="${dist.file.path}">
+            <fileset dir="${dist.dir.path}">
+                <include name="**/**"/>
+            </fileset>
+        </zip>
+    </target>
+</project>
