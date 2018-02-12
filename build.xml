@@ -21,11 +21,11 @@
         <phingcall target="build-compact-tmp-dir"/>
 
         <!-- Remove the tmp dir -->
-        <phingcall target="build-remove-dist-dir"/>
+        <phingcall target="build-remove-tmp-dir"/>
     </target>
 
 
-    <!-- Remove tmp dir if exists and create an empty dir -->
+    <!-- Remove dist dir if exists -->
     <target name="build-remove-dist-dir" hidden="true">
         <echo msg="Checking if the dist dir exists to remove it: ${dist.dir.path}"/>
 
@@ -33,6 +33,19 @@
             <available file="${dist.dir.path}"/>
             <then>
                 <delete dir="${dist.dir.path}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Remove tmp dir if exists -->
+    <target name="build-remove-tmp-dir" hidden="true">
+        <echo msg="Checking if the tmp dir exists to remove it: ${tmp.dir.path}"/>
+
+        <if>
+            <available file="${tmp.dir.path}"/>
+            <then>
+                <delete dir="${tmp.dir.path}"/>
             </then>
         </if>
     </target>
