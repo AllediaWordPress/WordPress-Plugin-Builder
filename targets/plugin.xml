@@ -18,4 +18,8 @@
 
         <setpluginversion dir="${src.dir.path}" version="${new.version}" pluginname="${plugin.name}"/>
     </target>
+
+    <target name="version">
+        <echo msg="Version: ${plugin.version}"/>
+    </target>
 </project>
