@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="plugin" default="">
+    <!-- Include the external tasks -->
+    <includepath classpath="${builder.path}/tasks"/>
+
+    <taskdef name="getpluginversion" classname="GetPluginVersion"/>
+    <taskdef name="getpluginname" classname="GetPluginName"/>
+    <taskdef name="setpluginversion" classname="SetPluginVersion"/>
+
+    <!-- Update the version in the plugin's files -->
+    <target name="set-version">
+        <property name="src.dir.path" value="./"/>
+
+        <getpluginname property="plugin.name" dir="${src.dir.path}"/>
+
+        <input propertyName="new.version" message="New version: "/>
+
+        <setpluginversion dir="${src.dir.path}" version="${new.version}" pluginname="${plugin.name}"/>
+    </target>
+</project>

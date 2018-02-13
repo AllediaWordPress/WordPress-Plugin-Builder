@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="build" default="">
+    <!-- Move the dist file to a common dir -->
+    <target name="move-to-common-dir" hidden="true">
+        <!-- Check if we need to move the dist file to a common path -->
+        <php expression="getenv('PS_GLOBAL_PACKAGES_PATH');" returnProperty="common.dest.path"/>
+
+        <condition property="move-files">
+            <and>
+                <not>
+                    <equals arg1="${common.dest.path}" arg2=""/>
+                </not>
+                <not>
+                    <equals arg1="${keep-file}" arg2="1"/>
+                </not>
+            </and>
+        </condition>
+        <if>
+            <equals arg1="${move-files}" arg2="true"/>
+            <then>
+                <!-- Move to the common dir -->
+                <move file="${dist.file.path}" todir="${common.dest.path}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Remove dist dir if exists -->
+    <target name="remove-dist-dir" hidden="true">
+        <echo msg="Checking if the dist dir exists to remove it: ${dist.dir.path}"/>
+
+        <if>
+            <available file="${dist.dir.path}"/>
+            <then>
+                <delete dir="${dist.dir.path}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Remove tmp dir if exists -->
+    <target name="remove-tmp-dir" hidden="true">
+        <echo msg="Checking if the tmp dir exists to remove it: ${tmp.dir.path}"/>
+
+        <if>
+            <available file="${tmp.dir.path}"/>
+            <then>
+                <delete dir="${tmp.dir.path}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Create the temporary dir -->
+    <target name="create-dist-dir" hidden="true">
+        <mkdir dir="${dist.dir.path}"/>
+    </target>
+
+
+    <!-- Copy files to the tmp dir -->
+    <target name="copy-files-to-tmp-dir" hidden="true">
+        <copy todir="${tmp.dir.path}">
+            <fileset dir="${src.dir.path}">
+                <exclude name="dist/"/>
+                <exclude name="tests/"/>
+                <exclude name="tools/"/>
+                <exclude name="assets/"/>
+                <exclude name=".idea/"/>
+                <exclude name="vendor/publishpress/wordpress-plugin-builder/"/>
+                <exclude name=".DS_Store"/>
+                <exclude name=".babelrc"/>
+                <exclude name=".gitignore"/>
+                <exclude name=".git"/>
+                <exclude name=".travis.yml"/>
+                <exclude name="build.xml"/>
+                <exclude name="codeception.yml"/>
+                <exclude name="dist.codeception.yml"/>
+                <exclude name="composer.json"/>
+                <exclude name="composer.lock"/>
+                <exclude name="composer.lock"/>
+                <exclude name="package.json"/>
+                <exclude name="phpunit.xml"/>
+                <exclude name="README.md"/>
+                <exclude name="RoboFile.php"/>
+            </fileset>
+        </copy>
+    </target>
+
+
+    <!-- Compact the tmp dir into a dist file -->
+    <target name="compact-tmp-dir" hidden="true">
+        <zip destfile="${dist.file.path}">
+            <fileset dir="${dist.dir.path}">
+                <include name="**/**"/>
+            </fileset>
+        </zip>
+    </target>
+</project>

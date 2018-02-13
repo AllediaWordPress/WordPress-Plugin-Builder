@@ -1,97 +1,80 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <project name="PublishPress" default="">
+    <property name="builder.path" value="vendor/publishpress/wordpress-plugin-builder"/>
+
+    <import file="${builder.path}/targets/plugin.xml"/>
+    <import file="${builder.path}/targets/build.xml"/>
+
+    <!-- Parameters -->
+    <property name="src.dir.path" value="./"/>
+    <property name="dist.dir.path" value="dist"/>
+    <property name="dist.file.name" value="${plugin.name}-${plugin.version}.zip"/>
+    <property name="dist.file.path" value="${dist.dir.path}/${dist.file.name}"/>
+    <property name="tmp.dir.path" value="${dist.dir.path}/${plugin.name}"/>
+
+    <!-- Get the plugin name and store in the property plugin.name -->
+    <getpluginname property="plugin.name" dir="${src.dir.path}"/>
+
+    <!-- Get the plugin version and store in the property plugin.version -->
+    <getpluginversion property="plugin.version" file="${src.dir.path}/${plugin.name}.php"/>
+
+
     <!-- Build a dist file -->
     <target name="build">
-        <!-- Parameters -->
-        <property name="src.dir.path" value="./"/>
-        <property name="dist.dir.path" value="dist"/>
-        <property name="dist.file.name" value="${plugin.name}-${plugin.version}.zip"/>
-        <property name="dist.file.path" value="${dist.dir.path}/${dist.file.name}"/>
-        <property name="tmp.dir.path" value="${dist.dir.path}/${plugin.name}"/>
-
         <!-- Create the dist folder -->
-        <phingcall target="build-remove-dist-dir"/>
-        <phingcall target="build-create-dist-dir"/>
+        <phingcall target="remove-dist-dir"/>
+        <phingcall target="create-dist-dir"/>
 
         <!-- Copy files to the dist dir -->
-        <phingcall target="build-copy-files-to-tmp-dir"/>
+        <phingcall target="copy-files-to-tmp-dir"/>
 
         <!-- Compact the tmp dir -->
-        <phingcall target="build-compact-tmp-dir"/>
+        <phingcall target="compact-tmp-dir"/>
 
         <!-- Remove the tmp dir -->
-        <phingcall target="build-remove-tmp-dir"/>
+        <phingcall target="remove-tmp-dir"/>
+
+        <!-- Move the file to a common dir, if allowed -->
+        <phingcall target="move-to-common-dir"/>
     </target>
 
+    <!-- Run the build and upload the package to a S3 bucket -->
+    <target name="build-s3">
+        <phingcall target="build">
+            <property name="keep-file" value="1" override="true"/>
+        </phingcall>
 
-    <!-- Remove dist dir if exists -->
-    <target name="build-remove-dist-dir" hidden="true">
-        <echo msg="Checking if the dist dir exists to remove it: ${dist.dir.path}"/>
+        <!-- Get properties -->
+        <php expression="md5(microtime());" returnProperty="uid"/>
+        <php expression="getenv('PS_S3_BUCKET');" returnProperty="s3.bucket"/>
+        <php expression="sprintf('s3://%s/%s/%s', '${s3.bucket}', '${uid}', '${dist.file.name}');"
+             returnProperty="s3.path"/>
+
+        <!-- Upload to the S3 bucket -->
+        <echo msg="Uploading to S3..."/>
+        <exec command="s3cmd put --acl-public --reduced-redundancy ${dist.file.path} ${s3.path}"/>
+
+        <!-- Copy the public link to the clipboard -->
+        <php expression="PHP_OS === 'Darwin' ? 'mac' : 'unix';" returnProperty="os"/>
+        <exec command="s3cmd info ${s3.path} | grep 'URL:' | awk '{ print $2 }'" outputProperty="s3.link"/>
 
         <if>
-            <available file="${dist.dir.path}"/>
+            <equals arg1="${os}" arg2="mac"/>
             <then>
-                <delete dir="${dist.dir.path}"/>
+                <exec command="echo '${s3.link}' | pbcopy"/>
+                <echo msg="Copying link ${s3.link} to the clipboard"/>
             </then>
         </if>
-    </target>
-
-
-    <!-- Remove tmp dir if exists -->
-    <target name="build-remove-tmp-dir" hidden="true">
-        <echo msg="Checking if the tmp dir exists to remove it: ${tmp.dir.path}"/>
 
         <if>
-            <available file="${tmp.dir.path}"/>
+            <equals arg1="${os}" arg2="unix"/>
             <then>
-                <delete dir="${tmp.dir.path}"/>
+                <exec command="echo '${s3.link}' | xclip -selection 'clipboard'"/>
+                <echo msg="Copying link ${s3.link} to the clipboard"/>
             </then>
         </if>
-    </target>
 
-
-    <!-- Create the temporary dir -->
-    <target name="build-create-dist-dir" hidden="true">
-        <mkdir dir="${dist.dir.path}"/>
-    </target>
-
-
-    <!-- Copy files to the tmp dir -->
-    <target name="build-copy-files-to-tmp-dir" hidden="true">
-        <copy todir="${tmp.dir.path}">
-            <fileset dir="${src.dir.path}">
-                <exclude name="dist/"/>
-                <exclude name="tests/"/>
-                <exclude name="tools/"/>
-                <exclude name="assets/"/>
-                <exclude name=".idea/"/>
-                <exclude name="vendor/publishpress/wordpress-plugin-builder/"/>
-                <exclude name=".DS_Store"/>
-                <exclude name=".babelrc"/>
-                <exclude name=".gitignore"/>
-                <exclude name=".git"/>
-                <exclude name=".travis.yml"/>
-                <exclude name="build.xml"/>
-                <exclude name="codeception.yml"/>
-                <exclude name="dist.codeception.yml"/>
-                <exclude name="composer.json"/>
-                <exclude name="composer.lock"/>
-                <exclude name="composer.lock"/>
-                <exclude name="package.json"/>
-                <exclude name="phpunit.xml"/>
-                <exclude name="README.md"/>
-                <exclude name="RoboFile.php"/>
-            </fileset>
-        </copy>
-    </target>
-
-
-    <target name="build-compact-tmp-dir" hidden="true">
-        <zip destfile="${dist.file.path}">
-            <fileset dir="${dist.dir.path}">
-                <include name="**/**"/>
-            </fileset>
-        </zip>
+        <phingcall target="move-to-common-dir"/>
     </target>
 </project>
