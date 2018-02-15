@@ -63,26 +63,17 @@ class SetPluginVersion extends Task
         $this->updateIncludesFile();
     }
 
-    protected function updateIncludesFile()
+    /**
+     * Update version in the
+     */
+    protected function updateReadme()
     {
-        $path = $this->dir . '/includes.php';
-
-        if (file_exists($path))
-        {
-            $path        = str_replace('//', '/', $path);
-            $pattern     = '/(.*[\'"]' . strtoupper($this->pluginname) . '_VERSION[\'"],\s*[\'"])[^\'"]+([\'"])/m';
-            $fileContent = file_get_contents($path);
-
-            // preg_replace is not correctly replacing groups. So we do that manually.
-            preg_match($pattern, $fileContent, $matches);
-
-            $this->updateFile(
-                $path,
-                '/(.*[\'"]' . strtoupper($this->pluginname) . '_VERSION[\'"],\s*[\'"])[^\'"]+([\'"])/m',
-                $matches[1] . $this->version . $matches[2],
-                'includes.php updated.'
-            );
-        }
+        $this->updateFile(
+            $this->dir . '/readme.txt',
+            '/^(Stable tag: )([^\n]*)\n/m',
+            'Stable tag: ' . $this->version . "\n",
+            'Readme.txt updated.'
+        );
     }
 
     /**
@@ -108,19 +99,6 @@ class SetPluginVersion extends Task
         $this->log($logMessage);
     }
 
-    /**
-     * Update version in the
-     */
-    protected function updateReadme()
-    {
-        $this->updateFile(
-            $this->dir . '/readme.txt',
-            '/^(Stable tag: )([^\n]*)\n/m',
-            'Stable tag: ' . $this->version . "\n",
-            'Readme.txt updated.'
-        );
-    }
-
     protected function updatePluginFile()
     {
         $this->updateFile(
@@ -129,5 +107,30 @@ class SetPluginVersion extends Task
             ' * Version: ' . $this->version . "\n",
             $this->pluginname . '.php updated.'
         );
+    }
+
+    protected function updateIncludesFile()
+    {
+        $path = $this->dir . '/includes.php';
+
+        if (file_exists($path))
+        {
+            $constant = strtoupper($this->pluginname);
+            $constant = preg_replace('/[^a-z0-9]/', '_', $constant) . '_VERSION';
+
+            $path        = str_replace('//', '/', $path);
+            $pattern     = '/(.*[\'"]' . $constant . '[\'"],\s*[\'"])[^\'"]+([\'"])/m';
+            $fileContent = file_get_contents($path);
+
+            // preg_replace is not correctly replacing groups. So we do that manually.
+            preg_match($pattern, $fileContent, $matches);
+
+            $this->updateFile(
+                $path,
+                '/(.*[\'"]' . $constant . '[\'"],\s*[\'"])[^\'"]+([\'"])/m',
+                $matches[1] . $this->version . $matches[2],
+                'includes.php updated.'
+            );
+        }
     }
 }
