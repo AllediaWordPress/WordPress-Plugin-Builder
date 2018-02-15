@@ -116,7 +116,7 @@ class SetPluginVersion extends Task
         if (file_exists($path))
         {
             $constant = strtoupper($this->pluginname);
-            $constant = preg_replace('/[^a-z0-9]/', '_', $constant) . '_VERSION';
+            $constant = preg_replace('/[^a-z0-9]/i', '_', $constant) . '_VERSION';
 
             $path        = str_replace('//', '/', $path);
             $pattern     = '/(.*[\'"]' . $constant . '[\'"],\s*[\'"])[^\'"]+([\'"])/m';
