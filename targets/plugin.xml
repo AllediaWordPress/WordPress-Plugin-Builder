@@ -10,6 +10,8 @@
 
     <!-- Update the version in the plugin's files -->
     <target name="set-version">
+        <phingcall target="version"/>
+
         <property name="src.dir.path" value="./"/>
 
         <getpluginname property="plugin.name" dir="${src.dir.path}"/>
