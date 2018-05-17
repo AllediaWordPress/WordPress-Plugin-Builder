@@ -87,6 +87,20 @@
                 <exclude name="phpunit.xml"/>
                 <exclude name="README.md"/>
                 <exclude name="RoboFile.php"/>
+                <exclude name=".AppleDouble"/>
+                <exclude name=".LSOverride"/>
+                <exclude name="Icon"/>
+                <exclude name="._*"/>
+                <exclude name=".DocumentRevisions-V100"/>
+                <exclude name=".fseventsd"/>
+                <exclude name=".Spotlight-V100"/>
+                <exclude name=".TemporaryItems"/>
+                <exclude name=".Trashes"/>
+                <exclude name=".VolumeIcon.icns"/>
+                <exclude name=".com.apple.timemachine.donotpresent"/>
+                <exclude name=".AppleDB"/>
+                <exclude name=".AppleDesktop"/>
+                <exclude name=".apdisk"/>
             </fileset>
         </copy>
     </target>
