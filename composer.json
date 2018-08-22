@@ -1,18 +1,42 @@
 {
-	"name"       : "publishpress/wordpress-plugin-builder",
-	"description": "Base class for WordPress plugin builder",
-	"type"       : "library",
-	"license"    : "GPL-2.0+",
-	"authors"    : [
-		{
-			"name": "PublishPress",
-			"email": "help@publishpress.com",
-			"homepage": "https://publishpress.com"
-		}
-	],
-	"autoload": {
-        "psr-4": {
-            "PublishPress\\Builder\\": "src/"
-        }
+  "name": "alledia/wordpress-plugin-builder",
+  "description": "Base classes and Phing scripts for building WordPress plugins",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "builder",
+    "phing"
+  ],
+  "type": "library",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "PublishPress",
+      "email": "help@publishpress.com",
+      "homepage": "https://publishpress.com"
+    },
+    {
+      "name": "Alledia",
+      "email": "help@alledia.com"
+    },
+    {
+      "name": "UpStream",
+      "email": "help@upstream.com"
+    },
+    {
+      "name": "Anderson Grudtner Martins",
+      "email": "anderson@grudtner.me",
+      "homepage": "http://anderson.grudtner.me",
+      "role": "Lead Developer"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "PublishPress\\Builder\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "phing/phing": "^2.16"
+  }
 }
