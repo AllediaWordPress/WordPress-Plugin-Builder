@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<project name="PublishPress" default="">
+<project name="AllediaBuilder" default="">
     <property name="builder.path" value="vendor/alledia/wordpress-plugin-builder"/>
 
     <import file="${builder.path}/targets/plugin.xml"/>
