@@ -1,5 +1,5 @@
 <?php
-namespace PublishPress\Builder;
+namespace Alledia\Builder;
 
 use DirectoryIterator;
 use \Robo\Common\ExecOneCommand;
@@ -480,7 +480,7 @@ abstract class AbstractTask extends \Robo\Tasks
      */
     protected function print_header() {
 
-        $title = "PressShack Builder Script: " . $this->plugin_name . "\n";
+        $title = "Alledia Builder Script: " . $this->plugin_name . "\n";
         $title .= str_repeat( '-', strlen( $title ) ) . "\n";
         $title .= "Plugin version: {$this->getVersion()}\n";
 

@@ -32,7 +32,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "PublishPress\\Builder\\": "src/"
+      "Alledia\\Builder\\": "src/"
     }
   },
   "require": {
