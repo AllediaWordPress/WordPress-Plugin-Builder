@@ -87,6 +87,7 @@
                 <exclude name="composer.lock"/>
                 <exclude name="composer.lock"/>
                 <exclude name="package.json"/>
+                <exclude name="package-lock.json"/>
                 <exclude name="phpunit.xml"/>
                 <exclude name="README.md"/>
                 <exclude name="RoboFile.php"/>
