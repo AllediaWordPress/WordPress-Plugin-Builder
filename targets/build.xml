@@ -66,6 +66,7 @@
                 <exclude name="bin/"/>
                 <exclude name="tests/"/>
                 <exclude name="tools/"/>
+                <exclude name="node_modules/"/>
                 <exclude name=".idea/"/>
                 <exclude name="vendor/alledia/wordpress-plugin-builder/"/>
                 <exclude name="vendor/phing/"/>
