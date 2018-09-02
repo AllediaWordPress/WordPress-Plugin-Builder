@@ -407,6 +407,7 @@ abstract class AbstractTask extends \Robo\Tasks
         $this->updateVersionMainPluginFile( $newVersion );
         $this->udpateVersionTxtFile( $newVersion );
         $this->udpateIncludeFile( $newVersion );
+        $this->udpateDefinesFile( $newVersion );
 
         $this->say( 'Current version: ' . $this->getVersion() );
     }
@@ -456,8 +457,7 @@ abstract class AbstractTask extends \Robo\Tasks
     }
 
     /**
-     * Updates the version in the plugin's txt file, if it is a
-     * stable version.
+     * Updates the version in the includes php file.
      */
     protected function udpateIncludeFile( $newVersion ) {
         $file = $this->source_path . '/includes.php';
@@ -474,6 +474,25 @@ abstract class AbstractTask extends \Robo\Tasks
             $this->say( 'Updated file: includes.php' );
         }
     }
+
+	/**
+	 * Updates the version in the defines php file.
+	 */
+	protected function udpateDefinesFile( $newVersion ) {
+		$file = $this->source_path . '/defines.php';
+		$content = file_get_contents( $file );
+
+		$content = preg_replace(
+			'/(\s*define\(\ *[\'"]' . $this->version_constant . '[\'"],\ [\'"])[0-9\-\.a-z]+([\'"])/',
+			'$1____NEW_VERSION____$2',
+			$content
+		);
+		$content = str_replace( '____NEW_VERSION____', $newVersion, $content);
+
+		if ( file_put_contents( $file, $content ) ) {
+			$this->say( 'Updated file: defines.php' );
+		}
+	}
 
     /**
      * Print the header.
