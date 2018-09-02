@@ -405,9 +405,9 @@ abstract class AbstractTask extends \Robo\Tasks
         $this->say( 'Original version: ' . $this->getVersion() );
 
         $this->updateVersionMainPluginFile( $newVersion );
-        $this->udpateVersionTxtFile( $newVersion );
-        $this->udpateIncludeFile( $newVersion );
-        $this->udpateDefinesFile( $newVersion );
+        $this->updateVersionTxtFile( $newVersion );
+        $this->updateIncludeFile( $newVersion );
+        $this->updateDefinesFile( $newVersion );
 
         $this->say( 'Current version: ' . $this->getVersion() );
     }
@@ -440,7 +440,7 @@ abstract class AbstractTask extends \Robo\Tasks
      * Updates the version in the plugin's txt file, if it is a
      * stable version.
      */
-    protected function udpateVersionTxtFile( $newVersion ) {
+    protected function updateVersionTxtFile( $newVersion ) {
         if ( ! $this->is_stable_version( $newVersion ) ) {
             return;
         }
@@ -459,7 +459,7 @@ abstract class AbstractTask extends \Robo\Tasks
     /**
      * Updates the version in the includes php file.
      */
-    protected function udpateIncludeFile( $newVersion ) {
+    protected function updateIncludeFile( $newVersion ) {
         $file = $this->source_path . '/includes.php';
         $content = file_get_contents( $file );
 
@@ -478,7 +478,7 @@ abstract class AbstractTask extends \Robo\Tasks
 	/**
 	 * Updates the version in the defines php file.
 	 */
-	protected function udpateDefinesFile( $newVersion ) {
+	protected function updateDefinesFile( $newVersion ) {
 		$file = $this->source_path . '/defines.php';
 		$content = file_get_contents( $file );
 
