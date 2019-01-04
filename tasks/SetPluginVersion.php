@@ -60,7 +60,8 @@ class SetPluginVersion extends Task
         }
 
         $this->updatePluginFile();
-        $this->updateIncludesFile();
+        $this->updateConstantInFile('/includes.php');
+        $this->updateConstantInFile('/defines.php');
     }
 
     /**
@@ -109,9 +110,9 @@ class SetPluginVersion extends Task
         );
     }
 
-    protected function updateIncludesFile()
+    protected function updateConstantInFile($filePath)
     {
-        $path = $this->dir . '/includes.php';
+        $path = $this->dir . $filePath;
 
         if (file_exists($path))
         {
@@ -129,7 +130,7 @@ class SetPluginVersion extends Task
                 $path,
                 '/(.*[\'"]' . $constant . '[\'"],\s*[\'"])[^\'"]+([\'"])/m',
                 $matches[1] . $this->version . $matches[2],
-                'includes.php updated.'
+                $filePath . ' updated.'
             );
         }
     }

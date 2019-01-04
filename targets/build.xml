@@ -75,8 +75,9 @@
                 <exclude name=".babelrc"/>
                 <exclude name=".gitignore"/>
                 <exclude name=".git"/>
-                <exclude name=".github"/>
+                <exclude name=".github/"/>
                 <exclude name=".travis.yml"/>
+                <exclude name=".editorconfig"/>
                 <exclude name="build.xml"/>
                 <exclude name="codeception.yml"/>
                 <exclude name="dist.codeception.yml"/>
