@@ -60,6 +60,8 @@ class SetPluginVersion extends Task
         }
 
         $this->updatePluginFile();
+
+        $this->updateConstantInFile($this->dir . '/' . $this->pluginname . '.php');
         $this->updateConstantInFile('/includes.php');
         $this->updateConstantInFile('/defines.php');
         $this->updateConstantInFile('/src/includes.php');
