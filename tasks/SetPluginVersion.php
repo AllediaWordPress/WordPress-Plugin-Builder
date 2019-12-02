@@ -9,17 +9,22 @@ class SetPluginVersion extends Task
     /**
      * @var string
      */
-    protected $dir;
+    private $dir;
 
     /**
      * @var string
      */
-    protected $version;
+    private $version;
 
     /**
      * @var string
      */
-    protected $pluginname;
+    private $pluginname;
+
+    /**
+     * @var string
+     */
+    private $constantname;
 
     /**
      * @param $dir
@@ -46,6 +51,14 @@ class SetPluginVersion extends Task
     }
 
     /**
+     * @param string $name
+     */
+    public function setConstantname($name)
+    {
+        $this->constantname = $name;
+    }
+
+    /**
      * The main method
      */
     public function main()
@@ -60,6 +73,7 @@ class SetPluginVersion extends Task
         }
 
         $this->updatePluginFile();
+        $this->updateConstantInFile($this->pluginname . '.php');
         $this->updateConstantInFile('/includes.php');
         $this->updateConstantInFile('/defines.php');
         $this->updateConstantInFile('/src/includes.php');
@@ -69,7 +83,7 @@ class SetPluginVersion extends Task
     /**
      * Update version in the
      */
-    protected function updateReadme()
+    private function updateReadme()
     {
         $this->updateFile(
             $this->dir . '/readme.txt',
@@ -87,7 +101,7 @@ class SetPluginVersion extends Task
      * @param string $replacement
      * @param string $logMessage
      */
-    protected function updateFile($path, $pattern, $replacement, $logMessage)
+    private function updateFile($path, $pattern, $replacement, $logMessage)
     {
         $path = str_replace('//', '/', $path);
 
@@ -102,7 +116,7 @@ class SetPluginVersion extends Task
         $this->log($logMessage);
     }
 
-    protected function updatePluginFile()
+    private function updatePluginFile()
     {
         $this->updateFile(
             $this->dir . '/' . $this->pluginname . '.php',
@@ -112,17 +126,14 @@ class SetPluginVersion extends Task
         );
     }
 
-    protected function updateConstantInFile($filePath)
+    private function updateConstantInFile($filePath)
     {
         $path = $this->dir . $filePath;
 
         if (file_exists($path))
         {
-            $constant = strtoupper($this->pluginname);
-            $constant = preg_replace('/[^a-z0-9]/i', '_', $constant) . '_VERSION';
-
             $path        = str_replace('//', '/', $path);
-            $pattern     = '/(.*[\'"]' . $constant . '[\'"],\s*[\'"])[^\'"]+([\'"])/m';
+            $pattern     = '/(.*[\'"]' . $this->constantname . '[\'"],\s*[\'"])[^\'"]+([\'"])/m';
             $fileContent = file_get_contents($path);
 
             // preg_replace is not correctly replacing groups. So we do that manually.
@@ -130,7 +141,7 @@ class SetPluginVersion extends Task
 
             $this->updateFile(
                 $path,
-                '/(.*[\'"]' . $constant . '[\'"],\s*[\'"])[^\'"]+([\'"])/m',
+                '/(.*[\'"]' . $this->constantname . '[\'"],\s*[\'"])[^\'"]+([\'"])/m',
                 $matches[1] . $this->version . $matches[2],
                 $filePath . ' updated.'
             );
