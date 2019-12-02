@@ -18,7 +18,7 @@
 
         <input propertyName="new.version" message="New version: "/>
 
-        <setpluginversion dir="${src.dir.path}" version="${new.version}" pluginname="${plugin.name}"/>
+        <setpluginversion dir="${src.dir.path}" version="${new.version}" pluginname="${plugin.name}" constantname="${version.constant}"/>
     </target>
 
     <target name="version">
