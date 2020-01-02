@@ -68,6 +68,7 @@
                 <exclude name="tools/"/>
                 <exclude name="node_modules/"/>
                 <exclude name=".idea/"/>
+                <exclude name=".ide.php"/>
                 <exclude name="vendor/alledia/wordpress-plugin-builder/"/>
                 <exclude name="vendor/phing/"/>
                 <exclude name="vendor/bin/"/>
@@ -106,6 +107,7 @@
                 <exclude name=".AppleDB"/>
                 <exclude name=".AppleDesktop"/>
                 <exclude name=".apdisk"/>
+                <exclude name="webpack.config.js"/>
             </fileset>
         </copy>
     </target>
