@@ -61,53 +61,7 @@
     <!-- Copy files to the tmp dir -->
     <target name="copy-files-to-tmp-dir" hidden="true">
         <copy todir="${tmp.dir.path}">
-            <fileset dir="${src.dir.path}">
-                <exclude name="dist/"/>
-                <exclude name="bin/"/>
-                <exclude name="tests/"/>
-                <exclude name="tools/"/>
-                <exclude name="node_modules/"/>
-                <exclude name=".idea/"/>
-                <exclude name=".ide.php"/>
-                <exclude name="vendor/alledia/wordpress-plugin-builder/"/>
-                <exclude name="vendor/phing/"/>
-                <exclude name="vendor/bin/"/>
-                <exclude name=".DS_Store"/>
-                <exclude name=".babelrc"/>
-                <exclude name=".gitignore"/>
-                <exclude name=".git"/>
-                <exclude name=".github/"/>
-                <exclude name=".travis.yml"/>
-                <exclude name=".editorconfig"/>
-                <exclude name="build.xml"/>
-                <exclude name="codeception.yml"/>
-                <exclude name="dist.codeception.yml"/>
-                <exclude name="phpcs.xml.dist"/>
-                <exclude name="phpunit.xml"/>
-                <exclude name="phpunit.xml.dist"/>
-                <exclude name="composer.json"/>
-                <exclude name="composer.lock"/>
-                <exclude name="composer.lock"/>
-                <exclude name="package.json"/>
-                <exclude name="package-lock.json"/>
-                <exclude name="phpunit.xml"/>
-                <exclude name="README.md"/>
-                <exclude name="RoboFile.php"/>
-                <exclude name=".AppleDouble"/>
-                <exclude name=".LSOverride"/>
-                <exclude name="Icon"/>
-                <exclude name="._*"/>
-                <exclude name=".DocumentRevisions-V100"/>
-                <exclude name=".fseventsd"/>
-                <exclude name=".Spotlight-V100"/>
-                <exclude name=".TemporaryItems"/>
-                <exclude name=".Trashes"/>
-                <exclude name=".VolumeIcon.icns"/>
-                <exclude name=".com.apple.timemachine.donotpresent"/>
-                <exclude name=".AppleDB"/>
-                <exclude name=".AppleDesktop"/>
-                <exclude name=".apdisk"/>
-                <exclude name="webpack.config.js"/>
+            <fileset dir="${src.dir.path}" excludes="${src.excludes},.AppleDB,.AppleDesktop,.AppleDouble,.DS_Store,.DocumentRevisions-V100,.LSOverride,.Spotlight-V100,.TemporaryItems,.Trashes,.VolumeIcon.icns,._*,.apdisk,.babelrc,.com.apple.timemachine.donotpresent,.editorconfig,.fseventsd,.git,.github/,.gitignore,.ide.php,.idea/,.travis.yml,CONTRIBUTING,CONTRIBUTING.md,CONTRIBUTING.txt,Icon,README.md,RoboFile.php,bin/,build.xml,codeception.yml,composer.json,composer.lock,contributing.md,contributing.txt,dist.codeception.yml,dist/,node_modules/,package-lock.json,package.json,phpcs.xml.dist,phpunit.xml,phpunit.xml.dist,tests/,tools/,vendor/alledia/wordpress-plugin-builder/,vendor/bin/,vendor/phing/,webpack.config.js">
             </fileset>
         </copy>
     </target>
