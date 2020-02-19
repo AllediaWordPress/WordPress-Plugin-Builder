@@ -12,7 +12,7 @@ https://getcomposer.org/download/
 $ composer global require phing/phing
 ```
 
-##Installation
+## Installation
 
 ```shell script
 $ composer global require alledia/wordpress-plugin-builder
