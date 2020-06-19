@@ -1,11 +1,11 @@
 {
-  "name": "alledia/wordpress-plugin-builder",
-  "description": "Base classes and Phing scripts for building WordPress plugins",
+  "name": "publishpress/wordpress-plugin-builder",
+  "description": "Robo tasks for building WordPress plugins",
   "keywords": [
     "wordpress",
     "plugin",
     "builder",
-    "phing"
+    "robo"
   ],
   "type": "library",
   "license": "GPL-2.0-or-later",
@@ -14,29 +14,14 @@
       "name": "PublishPress",
       "email": "help@publishpress.com",
       "homepage": "https://publishpress.com"
-    },
-    {
-      "name": "Alledia",
-      "email": "help@alledia.com"
-    },
-    {
-      "name": "UpStream",
-      "email": "help@upstream.com"
-    },
-    {
-      "name": "Anderson Grudtner Martins",
-      "email": "anderson@grudtner.me",
-      "homepage": "http://anderson.grudtner.me",
-      "role": "Lead Developer"
     }
   ],
   "autoload": {
     "psr-4": {
-      "Alledia\\Builder\\": "src/"
+      "PublishPressBuilder\\": "src/"
     }
   },
   "require": {
-    "php": ">=5.4.0",
-    "phing/phing": "^2"
+    "php": ">=5.6.*"
   }
 }
